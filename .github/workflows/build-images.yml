@@ -1,4 +1,4 @@
-name: Build container images for cross build
+name: Build Container Images
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       upload:
         type: boolean
         description: "Upload to registry"
-        default: false
+        default: true
 
 env:
   # used in cross-build/Makefile
