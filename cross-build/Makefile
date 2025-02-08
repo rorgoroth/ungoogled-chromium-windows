@@ -106,7 +106,7 @@ rc.cc:
 
 #### LLVM toolchain/libraries setup
 
-LLVM_VERSION = 19.1.2
+LLVM_VERSION = 19.1.7
 
 LLVM_URL = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LLVM_VERSION)/LLVM-$(LLVM_VERSION)-Linux-X64.tar.xz
 
