@@ -8,7 +8,7 @@
 
 # Defaults
 #
-git=no
+git=yes
 target_cpu=  # default is x64
 ccache=
 debug=no
@@ -381,7 +381,7 @@ then
 	run --wrap out/gn gen $out_dir --fail-on-unused-args
 fi
 
-targets='chrome chromedriver mini_installer'
+targets='chrome mini_installer'
 
 if [ $ci = yes ]
 then
