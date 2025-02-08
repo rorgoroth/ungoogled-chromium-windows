@@ -49,7 +49,7 @@ run apt-get -y install \
 	nano \
 	netcat-openbsd \
 	procps \
-	python3 \
+	python3-full \
 	python3-httplib2 \
 	quilt \
 	rsync \
