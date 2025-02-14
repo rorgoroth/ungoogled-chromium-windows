@@ -30,3 +30,7 @@ enable_platform_mpeg_h_audio=true
 enable_mse_mpeg2ts_stream_parser=true
 init_stack_vars_zero=true
 toolchain_supports_rust_thin_lto=true
+google_api_key = "no"
+google_default_client_id = "no"
+google_default_client_secret = "no"
+use_official_google_api_keys = false

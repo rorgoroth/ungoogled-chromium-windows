@@ -1,0 +1,113 @@
+diff -ruN a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
+--- a/build/config/compiler/BUILD.gn	2025-02-14 16:42:03.891000000 +0000
++++ b/build/config/compiler/BUILD.gn	2025-02-14 17:06:49.687919069 +0000
+@@ -498,9 +498,9 @@
+   # Linux/Android/Fuchsia common flags setup.
+   # ---------------------------------
+   if (is_linux || is_chromeos || is_android || is_fuchsia) {
+-    asmflags += [ "-fPIC" ]
+-    cflags += [ "-fPIC" ]
+-    ldflags += [ "-fPIC" ]
++    asmflags += [ "-fPIC", "-w", ]
++    cflags += [ "-fPIC", "-w", ]
++    ldflags += [ "-fPIC", "-w", ]
+     rustflags += [ "-Crelocation-model=pic" ]
+
+     if (!is_clang) {
+@@ -553,9 +553,9 @@
+
+     # TODO(crbug.com/345541122): investigate the fuchsia binary size increase.
+     if (is_win) {
+-      cflags += [ "/Zc:sizedDealloc-" ]
++      cflags += [ "/Zc:sizedDealloc" ]
+     } else {
+-      cflags += [ "-fno-sized-deallocation" ]
++      cflags += [ "-fsized-deallocation" ]
+     }
+   }
+
+@@ -607,23 +607,23 @@
+     if (default_toolchain != "//build/toolchain/cros:target" &&
+         !llvm_android_mainline) {
+       cflags += [
+-        "-mllvm",
+-        "-split-threshold-for-reg-with-hint=0",
++      #  "-mllvm",
++      #  "-split-threshold-for-reg-with-hint=0",
+       ]
+       if (use_thin_lto && is_a_target_toolchain) {
+         if (is_win) {
+-          ldflags += [ "-mllvm:-split-threshold-for-reg-with-hint=0" ]
++        #  ldflags += [ "-mllvm:-split-threshold-for-reg-with-hint=0" ]
+         } else {
+-          ldflags += [ "-Wl,-mllvm,-split-threshold-for-reg-with-hint=0" ]
++        #  ldflags += [ "-Wl,-mllvm,-split-threshold-for-reg-with-hint=0" ]
+         }
+       }
+     }
+
+     # TODO(crbug.com/40192287): Investigate why/if this should be needed.
+     if (is_win) {
+-      cflags += [ "/clang:-ffp-contract=off" ]
++      cflags += [ "/clang:-ffp-contract=fast" ]
+     } else {
+-      cflags += [ "-ffp-contract=off" ]
++      cflags += [ "-ffp-contract=fast" ]
+     }
+
+     # Enable ELF CREL (see crbug.com/357878242) for all platforms that use ELF
+@@ -1058,6 +1058,11 @@
+
+     # We use clang-rt sanitizer runtimes.
+     "-Zexternal-clangrt",
++
++    "-Ctarget-cpu=x86-64-v3",
++    "-Ztune-cpu=skylake-avx512",
++    "-Cllvm-args=-fp-contract=fast",
++    "-Awarnings",
+   ]
+
+   if (!is_win || force_rustc_color_output) {
+@@ -1141,7 +1146,7 @@
+ # building with ThinLTO, no optimization is performed in the link step.
+ config("thinlto_optimize_default") {
+   if (!is_debug && use_thin_lto && is_a_target_toolchain) {
+-    lto_opt_level = 0
++    lto_opt_level = 2
+
+     if (is_win) {
+       ldflags = [ "/opt:lldlto=" + lto_opt_level ]
+@@ -1174,7 +1179,7 @@
+     if (thin_lto_enable_optimizations) {
+       lto_opt_level = 2
+     } else {
+-      lto_opt_level = 0
++      lto_opt_level = 2
+     }
+
+     if (is_win) {
+@@ -1216,7 +1221,8 @@
+     if (current_cpu == "x64") {
+       cflags += [
+         "-m64",
+-        "-msse3",
++        "-march=x86-64-v3",
++        "-mtune=skylake-avx512",
+       ]
+
+       # Minimum SIMD support for devices running lacros.
+@@ -2658,10 +2664,13 @@
+       # Favor speed over size, /O2 must be before the common flags.
+       # /O2 implies /Ot, /Oi, and /GF.
+       cflags = [ "/O2" ] + common_optimize_on_cflags
++      if (is_clang) {
++        cflags += [ "/clang:-O3" ]
++      }
+     } else if (optimize_for_fuzzing) {
+       cflags = [ "-O1" ] + common_optimize_on_cflags
+     } else {
+-      cflags = [ "-O2" ] + common_optimize_on_cflags
++      cflags = [ "-O3" ] + common_optimize_on_cflags
+     }
+     rustflags = [ "-Copt-level=3" ]
+   }
