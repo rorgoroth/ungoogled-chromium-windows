@@ -196,8 +196,25 @@ jobs:
           path: cross-build/build/MD5SUMS*.repro
           if-no-files-found: error
 
+      - name: create_release_tag
+        uses: rearrangement/auto-releases@v1.1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: Latest Build
+
+      - name: upload_packages
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: cross-build/build/ungoogled-chromium_*.exe
+          tag: latest
+          overwrite: true
+          file_glob: true
+
   cleanup:
-    if: always()
+#    if: always()
     needs: [stage-3]
     runs-on: ubuntu-24.04
     permissions:
