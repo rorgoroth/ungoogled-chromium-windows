@@ -177,8 +177,7 @@ if [ ! -f stamp-download ]
 then
 	if [ $git = yes ]
 	then
-		pgo=$(test $x86 = yes && echo win32 || echo win64)
-		run $u_c/utils/clone.py --output src --pgo $pgo
+		run $u_c/utils/clone.py --output src --pgo win64
 	else
 		dl_args="--ini $u_c/downloads.ini --cache download_cache"
 
