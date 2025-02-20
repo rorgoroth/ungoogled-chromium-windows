@@ -45,41 +45,14 @@ jobs:
           echo "Chromium version: $version"
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Restore Chromium source tarball download cache
-        id: restore-cache
-        uses: actions/cache/restore@v4
-        with:
-          key: chromium-source-${{steps.chromium.outputs.version}}
-          path: cross-build/build/download_cache
-
-      - name: Download and/or verify Chromium source tarball
-        run: |
-          cache=cross-build/build/download_cache
-          mkdir -p $cache
-          ungoogled-chromium/utils/downloads.py retrieve \
-            --ini ungoogled-chromium/downloads.ini \
-            --cache $cache \
-            --hide-progress-bar
-          ls -l $cache
-
-      - name: Save Chromium source tarball download cache
-        if: ${{!steps.restore-cache.outputs.cache-hit}}
-        uses: actions/cache/save@v4
-        with:
-          key: chromium-source-${{steps.chromium.outputs.version}}
-          path: cross-build/build/download_cache
-
       - name: Prepare the build
-        run: cd cross-build && ./build.sh --ci --${{inputs.target-cpu}} ${{inputs.debug && '--debug' || ''}}
+        run: cd cross-build && ./build.sh --git --ci --${{inputs.target-cpu}} ${{inputs.debug && '--debug' || ''}}
 
       - name: Prepare GHCI build strategy
         run: |
           cd cross-build/build/src/out/Default*
           targets=$(cat build.targets)
           $GITHUB_WORKSPACE/skunk-tmp/ghci-strategy.sh 8 $targets
-
-      - name: Delete the download cache
-        run: rm -r cross-build/build/download_cache
 
       - name: Stage 1 build (${{inputs.target-cpu}})
         run: |
